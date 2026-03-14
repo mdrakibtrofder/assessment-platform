@@ -423,7 +423,7 @@ const QuestionViewer = () => {
             {gridSelectQ9.options.map((opt, i) => (
               <button
                 key={i}
-                onClick={() => toggleGridSelect(gridSelect9, setGridSelect9, i, 4)}
+                onClick={() => toggleGridSelect(gridSelect9, setGridSelect9, i, 4, 'gridSelect9')}
                 className={cn(
                   "px-3 py-3.5 rounded-xl border text-sm font-medium transition-all duration-200 text-center relative",
                   gridSelect9.has(i)

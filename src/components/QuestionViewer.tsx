@@ -117,20 +117,50 @@ const trueFalseQ10 = {
   ],
 };
 
+const STORAGE_KEY = "assessment-platform-answers";
+
+const loadFromStorage = () => {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) return JSON.parse(saved);
+  } catch {}
+  return null;
+};
+
+const saveToStorage = (data: any) => {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  } catch {}
+};
+
 const QuestionViewer = () => {
-  const [mcqAnswers, setMcqAnswers] = useState<Record<number, number>>({});
-  const [gridSelect6, setGridSelect6] = useState<Set<number>>(new Set());
-  const [multiSelect7, setMultiSelect7] = useState<Set<number>>(new Set());
-  const [matching, setMatching] = useState<Record<number, number | null>>({ 0: null, 1: null, 2: null, 3: null });
-  const [gridSelect9, setGridSelect9] = useState<Set<number>>(new Set());
-  const [trueFalse, setTrueFalse] = useState<Record<number, boolean | null>>({});
+  const saved = loadFromStorage();
+  const [mcqAnswers, setMcqAnswers] = useState<Record<number, number>>(saved?.mcqAnswers ?? {});
+  const [gridSelect6, setGridSelect6] = useState<Set<number>>(new Set(saved?.gridSelect6 ?? []));
+  const [multiSelect7, setMultiSelect7] = useState<Set<number>>(new Set(saved?.multiSelect7 ?? []));
+  const [matching, setMatching] = useState<Record<number, number | null>>(saved?.matching ?? { 0: null, 1: null, 2: null, 3: null });
+  const [gridSelect9, setGridSelect9] = useState<Set<number>>(new Set(saved?.gridSelect9 ?? []));
+  const [trueFalse, setTrueFalse] = useState<Record<number, boolean | null>>(saved?.trueFalse ?? {});
   const [hoveredMatch, setHoveredMatch] = useState<number | null>(null);
 
-  const toggleGridSelect = (set: Set<number>, setFn: (s: Set<number>) => void, idx: number, max: number) => {
+  const persistAll = (overrides: any = {}) => {
+    const data = {
+      mcqAnswers: overrides.mcqAnswers ?? mcqAnswers,
+      gridSelect6: [...(overrides.gridSelect6 ?? gridSelect6)],
+      multiSelect7: [...(overrides.multiSelect7 ?? multiSelect7)],
+      matching: overrides.matching ?? matching,
+      gridSelect9: [...(overrides.gridSelect9 ?? gridSelect9)],
+      trueFalse: overrides.trueFalse ?? trueFalse,
+    };
+    saveToStorage(data);
+  };
+
+  const toggleGridSelect = (set: Set<number>, setFn: (s: Set<number>) => void, idx: number, max: number, key: string) => {
     const next = new Set(set);
     if (next.has(idx)) next.delete(idx);
     else if (next.size < max) next.add(idx);
     setFn(next);
+    persistAll({ [key]: next });
   };
 
   const answeredMcq = Object.keys(mcqAnswers).length;
@@ -195,19 +225,15 @@ const QuestionViewer = () => {
                 {q.options.map((opt, i) => (
                   <button
                     key={i}
-                    onClick={() => setMcqAnswers({ ...mcqAnswers, [q.id]: i })}
+                    onClick={() => { const next = { ...mcqAnswers, [q.id]: i }; setMcqAnswers(next); persistAll({ mcqAnswers: next }); }}
                     className={cn(
                       "text-left px-4 py-3 rounded-xl border text-sm transition-all duration-200 relative overflow-hidden",
                       mcqAnswers[q.id] === i
-                        ? "border-primary bg-gradient-to-r from-primary/10 to-accent/40 text-foreground font-medium shadow-md ring-1 ring-primary/30"
+                        ? "border-primary bg-gradient-to-br from-primary to-accent-foreground text-primary-foreground font-medium shadow-lg scale-[1.02]"
                         : "border-border bg-card text-foreground hover:border-primary/40 hover:shadow-sm hover:translate-x-0.5"
                     )}
                   >
-                    {mcqAnswers[q.id] === i && (
-                      <div className="absolute top-0 right-0 w-6 h-6 bg-gradient-to-bl from-primary to-transparent rounded-bl-xl flex items-end justify-start p-0.5">
-                        <CheckCircle2 className="w-3 h-3 text-primary-foreground" />
-                      </div>
-                    )}
+                    {mcqAnswers[q.id] === i && <CheckCircle2 className="w-3.5 h-3.5 absolute top-1 right-1 text-primary-foreground/80" />}
                     {opt}
                   </button>
                 ))}
@@ -239,7 +265,7 @@ const QuestionViewer = () => {
             {gridSelectQ6.options.map((opt, i) => (
               <button
                 key={i}
-                onClick={() => toggleGridSelect(gridSelect6, setGridSelect6, i, 4)}
+                onClick={() => toggleGridSelect(gridSelect6, setGridSelect6, i, 4, 'gridSelect6')}
                 className={cn(
                   "px-3 py-3.5 rounded-xl border text-sm font-medium transition-all duration-200 text-center relative",
                   gridSelect6.has(i)
@@ -280,17 +306,17 @@ const QuestionViewer = () => {
             {multiSelectQ7.options.map((opt, i) => (
               <button
                 key={i}
-                onClick={() => toggleGridSelect(multiSelect7, setMultiSelect7, i, 3)}
+                onClick={() => toggleGridSelect(multiSelect7, setMultiSelect7, i, 3, 'multiSelect7')}
                 className={cn(
                   "text-left px-5 py-3.5 rounded-xl border text-sm font-medium transition-all duration-200 flex items-center gap-3",
                   multiSelect7.has(i)
-                    ? "border-primary bg-gradient-to-r from-primary/10 to-accent/40 text-foreground shadow-md ring-1 ring-primary/30"
+                    ? "border-primary bg-gradient-to-br from-primary to-accent-foreground text-primary-foreground shadow-lg scale-[1.02]"
                     : "border-border bg-card text-foreground hover:border-primary/40 hover:shadow-sm"
                 )}
               >
                 <div className={cn(
                   "w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all shrink-0",
-                  multiSelect7.has(i) ? "border-primary bg-primary" : "border-muted-foreground/30"
+                  multiSelect7.has(i) ? "border-primary-foreground/50 bg-primary-foreground/20" : "border-muted-foreground/30"
                 )}>
                   {multiSelect7.has(i) && <CheckCircle2 className="w-3.5 h-3.5 text-primary-foreground" />}
                 </div>
@@ -358,7 +384,7 @@ const QuestionViewer = () => {
                 </div>
                 <select
                   value={matching[i] ?? ""}
-                  onChange={(e) => setMatching({ ...matching, [i]: e.target.value === "" ? null : Number(e.target.value) })}
+                  onChange={(e) => { const next = { ...matching, [i]: e.target.value === "" ? null : Number(e.target.value) }; setMatching(next); persistAll({ matching: next }); }}
                   className={cn(
                     "px-3 py-3 rounded-xl border text-sm transition-all duration-200 bg-card text-foreground focus:ring-2 focus:ring-ring cursor-pointer",
                     matching[i] !== null ? "border-primary/40 font-medium" : "border-border"
@@ -397,7 +423,7 @@ const QuestionViewer = () => {
             {gridSelectQ9.options.map((opt, i) => (
               <button
                 key={i}
-                onClick={() => toggleGridSelect(gridSelect9, setGridSelect9, i, 4)}
+                onClick={() => toggleGridSelect(gridSelect9, setGridSelect9, i, 4, 'gridSelect9')}
                 className={cn(
                   "px-3 py-3.5 rounded-xl border text-sm font-medium transition-all duration-200 text-center relative",
                   gridSelect9.has(i)
@@ -453,7 +479,7 @@ const QuestionViewer = () => {
                 <span className="text-foreground leading-relaxed pr-4">{stmt}</span>
                 <div className="flex justify-center">
                   <button
-                    onClick={() => setTrueFalse({ ...trueFalse, [i]: true })}
+                    onClick={() => { const next = { ...trueFalse, [i]: true }; setTrueFalse(next); persistAll({ trueFalse: next }); }}
                     className={cn(
                       "w-9 h-9 rounded-xl border-2 transition-all duration-200 flex items-center justify-center text-xs font-bold",
                       trueFalse[i] === true
@@ -466,11 +492,11 @@ const QuestionViewer = () => {
                 </div>
                 <div className="flex justify-center">
                   <button
-                    onClick={() => setTrueFalse({ ...trueFalse, [i]: false })}
+                    onClick={() => { const next = { ...trueFalse, [i]: false }; setTrueFalse(next); persistAll({ trueFalse: next }); }}
                     className={cn(
                       "w-9 h-9 rounded-xl border-2 transition-all duration-200 flex items-center justify-center text-xs font-bold",
                       trueFalse[i] === false
-                        ? "border-destructive bg-destructive text-destructive-foreground shadow-md scale-110"
+                        ? "border-destructive bg-gradient-to-br from-destructive to-pink-500 text-destructive-foreground shadow-md scale-110"
                         : "border-border text-muted-foreground hover:border-destructive/50 hover:scale-105"
                     )}
                   >

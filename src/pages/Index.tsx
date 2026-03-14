@@ -1,20 +1,29 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import UniversityCard from "@/components/UniversityCard";
 import AssessmentDetails from "@/components/AssessmentDetails";
 import QuestionViewer from "@/components/QuestionViewer";
 
+const FORM_KEY = "assessment-platform-form";
+
 const Index = () => {
-  const [courseCode, setCourseCode] = useState("");
-  const [studentId, setStudentId] = useState("");
-  const [studentName, setStudentName] = useState("");
-  const [ctNumber, setCtNumber] = useState("");
+  const saved = (() => { try { const s = localStorage.getItem(FORM_KEY); return s ? JSON.parse(s) : null; } catch { return null; } })();
+  const [courseCode, setCourseCode] = useState(saved?.courseCode ?? "");
+  const [studentId, setStudentId] = useState(saved?.studentId ?? "");
+  const [studentName, setStudentName] = useState(saved?.studentName ?? "");
+  const [ctNumber, setCtNumber] = useState(saved?.ctNumber ?? "");
+
+  useEffect(() => {
+    localStorage.setItem(FORM_KEY, JSON.stringify({ courseCode, studentId, studentName, ctNumber }));
+  }, [courseCode, studentId, studentName, ctNumber]);
 
   const handleReset = () => {
     setCourseCode("");
     setStudentId("");
     setStudentName("");
     setCtNumber("");
+    localStorage.removeItem(FORM_KEY);
+    localStorage.removeItem("assessment-platform-answers");
   };
 
   const showQuestions = courseCode === "CSE 4215" && ctNumber === "CT 1";

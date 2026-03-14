@@ -597,12 +597,20 @@ const QuestionViewer = ({ metadata }: { metadata: any }) => {
                   const { exportToPDF } = await import("@/lib/exportUtils");
                   const questionsContainer = document.querySelector(".questions-content");
 
-                  const submissionData = {
-                    studentId: metadata.studentId,
-                    studentName: metadata.studentName,
-                    courseCode: metadata.courseCode,
-                    courseName: metadata.courseName,
-                    ctNumber: metadata.ctNumber,
+                  // Fix for select values not being captured in innerHTML
+                  const selects = questionsContainer?.querySelectorAll('select');
+                  selects?.forEach(select => {
+                    const val = select.value;
+                    const options = select.querySelectorAll('option');
+                    options.forEach(opt => {
+                      if (opt.value === val) opt.setAttribute('selected', 'selected');
+                      else opt.removeAttribute('selected');
+                    });
+                  });
+
+                  await exportToPDF({
+                    ...metadata,
+                    questionsHtml: questionsContainer?.innerHTML || "",
                     answers: {
                       mcqAnswers,
                       gridSelect6: Array.from(gridSelect6),
@@ -611,22 +619,14 @@ const QuestionViewer = ({ metadata }: { metadata: any }) => {
                       gridSelect9: Array.from(gridSelect9),
                       trueFalse,
                     }
-                  };
-
-                  await exportToPDF({
-                    ...metadata,
-                    questionsHtml: questionsContainer?.innerHTML || ""
                   });
 
-                  const response = await axios.post("http://localhost:3001/assessment/submit", submissionData);
-
-                  setFinalScore(response.data.score);
                   setShowPreview(false);
                   setShowSuccess(true);
-                  localStorage.removeItem(STORAGE_KEY);
+                  // localStorage.removeItem(STORAGE_KEY); // User requested not to reset values
                 } catch (err) {
                   console.error(err);
-                  toast.error("Submission failed. Please check backend connection.");
+                  toast.error("PDF generation failed.");
                 } finally {
                   setIsSubmitting(false);
                 }
@@ -634,7 +634,7 @@ const QuestionViewer = ({ metadata }: { metadata: any }) => {
               className="bg-primary hover:bg-primary/90 font-bold px-8 h-12 rounded-xl flex items-center gap-2 shadow-lg"
             >
               {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
-              {isSubmitting ? "Processing..." : "Confirm Submission"}
+              {isSubmitting ? "Generating PDF..." : "Confirm & Download PDF"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -642,30 +642,35 @@ const QuestionViewer = ({ metadata }: { metadata: any }) => {
 
       <Dialog open={showSuccess} onOpenChange={setShowSuccess}>
         <DialogContent className="max-w-md p-0 border-none shadow-2xl overflow-hidden" hideClose>
-          <div className="bg-gradient-to-br from-emerald-500 to-teal-600 p-12 text-center text-white">
+          <div className="bg-gradient-to-br from-indigo-600 to-violet-700 p-12 text-center text-white">
             <div className="mx-auto w-24 h-24 bg-white/20 rounded-full flex items-center justify-center mb-6 scale-110 animate-bounce">
               <CheckCircle2 className="w-12 h-12 text-white" />
             </div>
-            <h2 className="text-3xl font-display font-black mb-2">Submission Success!</h2>
-            <p className="text-emerald-50 font-medium">Your assessment has been securely synced and graded.</p>
+            <h2 className="text-3xl font-display font-black mb-2">PDF Generated!</h2>
+            <p className="text-indigo-50 font-medium">Your assessment report is ready for submission.</p>
           </div>
           <div className="p-8 bg-white space-y-6 text-center">
-            <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100">
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Your Preliminary Grade</p>
-              <p className="text-5xl font-display font-black text-slate-800">{finalScore ?? '--'}<span className="text-lg text-slate-400">/15</span></p>
+            <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100 flex flex-col items-center gap-3">
+              <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center">
+                <Send className="w-6 h-6 text-amber-600" />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-slate-800">Submit on Google Classroom</p>
+                <p className="text-xs text-slate-500 mt-1">Please upload the downloaded PDF to your assigned classroom task.</p>
+              </div>
             </div>
             <div className="space-y-4">
               <p className="text-sm text-slate-500 leading-relaxed">
-                A PDF copy of your submission has been downloaded. You may logout or refresh the platform to start a new session.
+                The file has been saved to your downloads folder. Ensure you don't rename it to maintain consistency.
               </p>
               <Button onClick={() => window.location.reload()} className="w-full bg-slate-900 hover:bg-slate-800 h-14 rounded-2xl font-bold text-lg">
-                Finished
+                I've Downloaded It
               </Button>
             </div>
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+    </div >
   );
 };
 

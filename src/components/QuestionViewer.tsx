@@ -117,14 +117,43 @@ const trueFalseQ10 = {
   ],
 };
 
+const STORAGE_KEY = "assessment-platform-answers";
+
+const loadFromStorage = () => {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) return JSON.parse(saved);
+  } catch {}
+  return null;
+};
+
+const saveToStorage = (data: any) => {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  } catch {}
+};
+
 const QuestionViewer = () => {
-  const [mcqAnswers, setMcqAnswers] = useState<Record<number, number>>({});
-  const [gridSelect6, setGridSelect6] = useState<Set<number>>(new Set());
-  const [multiSelect7, setMultiSelect7] = useState<Set<number>>(new Set());
-  const [matching, setMatching] = useState<Record<number, number | null>>({ 0: null, 1: null, 2: null, 3: null });
-  const [gridSelect9, setGridSelect9] = useState<Set<number>>(new Set());
-  const [trueFalse, setTrueFalse] = useState<Record<number, boolean | null>>({});
+  const saved = loadFromStorage();
+  const [mcqAnswers, setMcqAnswers] = useState<Record<number, number>>(saved?.mcqAnswers ?? {});
+  const [gridSelect6, setGridSelect6] = useState<Set<number>>(new Set(saved?.gridSelect6 ?? []));
+  const [multiSelect7, setMultiSelect7] = useState<Set<number>>(new Set(saved?.multiSelect7 ?? []));
+  const [matching, setMatching] = useState<Record<number, number | null>>(saved?.matching ?? { 0: null, 1: null, 2: null, 3: null });
+  const [gridSelect9, setGridSelect9] = useState<Set<number>>(new Set(saved?.gridSelect9 ?? []));
+  const [trueFalse, setTrueFalse] = useState<Record<number, boolean | null>>(saved?.trueFalse ?? {});
   const [hoveredMatch, setHoveredMatch] = useState<number | null>(null);
+
+  const persistAll = (overrides: any = {}) => {
+    const data = {
+      mcqAnswers: overrides.mcqAnswers ?? mcqAnswers,
+      gridSelect6: [...(overrides.gridSelect6 ?? gridSelect6)],
+      multiSelect7: [...(overrides.multiSelect7 ?? multiSelect7)],
+      matching: overrides.matching ?? matching,
+      gridSelect9: [...(overrides.gridSelect9 ?? gridSelect9)],
+      trueFalse: overrides.trueFalse ?? trueFalse,
+    };
+    saveToStorage(data);
+  };
 
   const toggleGridSelect = (set: Set<number>, setFn: (s: Set<number>) => void, idx: number, max: number) => {
     const next = new Set(set);

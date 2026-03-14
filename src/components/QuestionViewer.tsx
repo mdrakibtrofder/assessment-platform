@@ -224,11 +224,11 @@ const QuestionViewer = () => {
                 {q.options.map((opt, i) => (
                   <button
                     key={i}
-                    onClick={() => setMcqAnswers({ ...mcqAnswers, [q.id]: i })}
+                    onClick={() => { const next = { ...mcqAnswers, [q.id]: i }; setMcqAnswers(next); persistAll({ mcqAnswers: next }); }}
                     className={cn(
                       "text-left px-4 py-3 rounded-xl border text-sm transition-all duration-200 relative overflow-hidden",
                       mcqAnswers[q.id] === i
-                        ? "border-primary bg-gradient-to-r from-primary/10 to-accent/40 text-foreground font-medium shadow-md ring-1 ring-primary/30"
+                        ? "border-primary bg-gradient-to-br from-primary to-accent-foreground text-primary-foreground font-medium shadow-lg scale-[1.02]"
                         : "border-border bg-card text-foreground hover:border-primary/40 hover:shadow-sm hover:translate-x-0.5"
                     )}
                   >

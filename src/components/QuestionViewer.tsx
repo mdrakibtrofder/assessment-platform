@@ -479,7 +479,7 @@ const QuestionViewer = () => {
                 <span className="text-foreground leading-relaxed pr-4">{stmt}</span>
                 <div className="flex justify-center">
                   <button
-                    onClick={() => setTrueFalse({ ...trueFalse, [i]: true })}
+                    onClick={() => { const next = { ...trueFalse, [i]: true }; setTrueFalse(next); persistAll({ trueFalse: next }); }}
                     className={cn(
                       "w-9 h-9 rounded-xl border-2 transition-all duration-200 flex items-center justify-center text-xs font-bold",
                       trueFalse[i] === true

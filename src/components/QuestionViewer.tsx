@@ -1,76 +1,119 @@
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { CheckCircle2, XCircle, ArrowRight, Sparkles } from "lucide-react";
 
-// Question data for CSE 4215 CT 1
 const mcqQuestions = [
   {
     id: 1,
-    text: "Which of the following is a key principle of professional ethics in computing?",
-    options: ["A) Maximize profit at all costs", "B) Act with integrity and honesty", "C) Ignore user privacy", "D) Share confidential data freely"],
+    text: "According to the first principle of the Code of Ethics, software engineers must act consistently with",
+    options: [
+      "A) The client's profit",
+      "B) The Public interest",
+      "C) Their own career goals",
+      "D) The latest technology trends",
+    ],
   },
   {
     id: 2,
-    text: "The ACM Code of Ethics primarily emphasizes which of the following?",
-    options: ["A) Revenue generation", "B) Public interest and harm avoidance", "C) Software speed optimization", "D) Hardware maintenance"],
+    text: 'What is "Fabrication" in the context of lying?',
+    options: [
+      "A) A statement not based on fact",
+      "B) Sarcasm, storytelling or comedy",
+      "C) A strategic lie",
+      "D) A harmless lie",
+    ],
   },
   {
     id: 3,
-    text: "Intellectual property rights in software include:",
-    options: ["A) Only patents", "B) Patents, copyrights, and trade secrets", "C) Only copyrights", "D) None of the above"],
+    text: "According to Principle 3 (Product), software engineers should ensure that their products meet:",
+    options: [
+      "A) The highest professional standards possible",
+      "B) Only the legal minimum requirements",
+      "C) The lowest possible cost",
+      "D) The marketing department's hype",
+    ],
   },
   {
     id: 4,
-    text: "Which legislation primarily governs data protection in many countries?",
-    options: ["A) GDPR", "B) HTML5 Standard", "C) IEEE 802.11", "D) TCP/IP Protocol"],
+    text: 'The "Computer Game Fallacy" involves the mistaken belief that:',
+    options: [
+      "A) All software should be gamified.",
+      "B) Real-life actions have no serious consequences, like in a video game",
+      "C) Video games are too difficult to program",
+      "D) Computer games are primarily designed for educational purposes",
+    ],
   },
   {
     id: 5,
-    text: "A software engineer's responsibility to society includes:",
-    options: ["A) Only delivering code on time", "B) Ensuring software safety and reliability", "C) Minimizing testing", "D) Avoiding documentation"],
+    text: "Rushing a product to market without testing is an example of which conflict?",
+    options: [
+      "A) Privacy vs. Security",
+      "B) Innovation vs. Regulation",
+      "C) Profit vs. User Safety",
+      "D) Individual rights vs. Public protection",
+    ],
   },
 ];
 
 const gridSelectQ6 = {
   id: 6,
-  text: "Select exactly 4 ethical principles that a computing professional must follow:",
-  options: ["Integrity", "Transparency", "Negligence", "Accountability", "Privacy", "Deception", "Fairness", "Competence", "Bias", "Exploitation"],
+  text: "There are eight principles in the ACM Code of Ethics. Identify the four correct principles from the options provided below.",
+  options: [
+    "Efficiency", "Security", "Public", "Company", "Product",
+    "Management", "Compliance", "Project", "Colleagues", "Government",
+  ],
 };
 
 const multiSelectQ7 = {
   id: 7,
-  text: "Select exactly 3 responsibilities of a software engineer according to IEEE-CS code:",
-  options: ["Public safety", "Client interest", "Ignoring standards", "Professional development", "Code plagiarism", "Product quality"],
+  text: "Which three of the following statements accurately describe the core focus of these specific organizational cultures? (Select three correct options)",
+  options: [
+    "a) Government culture prioritizes strict regulatory compliance.",
+    "b) Silicon Valley prioritizes bureaucratic stability.",
+    "c) Japanese culture focuses on rapid individual profit.",
+    "d) Silicon Valley focuses on rapid innovation.",
+    "e) Japanese culture emphasizes collective responsibility.",
+    "f) Government culture adopts a \"move fast and break things\" mentality.",
+  ],
 };
 
 const matchingQ8 = {
   id: 8,
-  text: "Match each ethical concept (left) with its correct description (right):",
-  left: ["Privacy", "Intellectual Property", "Whistleblowing", "Plagiarism"],
+  text: "Match Table A with Table B by drawing an arrow from the item in Table A to the corresponding item in Table B.",
+  left: [
+    "Shatterproof fallacy",
+    "Candy-from-a-baby fallacy",
+    "Law Abiding Citizen Fallacy",
+    "Free information fallacy",
+  ],
   right: [
-    "Reporting unethical practices within an organization",
-    "Right to control personal information",
-    "Legal protection for creative works",
-    "Presenting others' work as one's own",
+    "Knowledge Isn't Costless",
+    "Legality is Not Morality",
+    "Nothing is Unbreakable",
+    "Easy Isn't Effortless",
   ],
 };
 
 const gridSelectQ9 = {
   id: 9,
-  text: "Select exactly 4 items that are considered professional misconduct in computing:",
-  options: ["Data theft", "Peer review", "Unauthorized access", "Open-source contribution", "Code documentation", "Identity fraud", "Mentoring", "Copyright violation", "Testing", "Ethical hacking certification"],
+  text: "From the list below, select the four correct forms of lies commonly identified in professional and communication ethics.",
+  options: [
+    "Bribery", "Fabrication", "Conflict of interest", "Regulatory compliance", "Bald-faced lie",
+    "Inaccurate disclosure", "Black lie", "Lying by omission", "Objective", "Emergency lie",
+  ],
 };
 
 const trueFalseQ10 = {
   id: 10,
-  text: "Mark each statement as True or False:",
+  text: "Read each statement below carefully. Write True if the statement accurately describes a lie, or False if it does not. (Hint: Three options are true and three options are false)",
   statements: [
-    "Software engineers have no obligation to report security vulnerabilities.",
-    "The ACM Code of Ethics applies only to ACM members.",
-    "Copying open-source code without attribution is acceptable.",
-    "Professional competence requires continuous learning.",
-    "Privacy is a fundamental right in digital ethics.",
-    "Whistleblowing is always considered unethical.",
+    "a) A lie involves providing false information with the specific goal of tricking another person.",
+    "b) If you accidentally say something incorrect because you forgot the facts, you are lying.",
+    "c) Using a false statement to gain a reward or a personal advantage is a form of lying.",
+    "d) To be considered a lie, the speaker must believe that what they are saying is actually true.",
+    "e) Lying can include trying to make yourself look better by stating things you know are wrong.",
+    "f) A statement is only a lie if the other person immediately realizes they have been fooled.",
   ],
 };
 
@@ -78,229 +121,365 @@ const QuestionViewer = () => {
   const [mcqAnswers, setMcqAnswers] = useState<Record<number, number>>({});
   const [gridSelect6, setGridSelect6] = useState<Set<number>>(new Set());
   const [multiSelect7, setMultiSelect7] = useState<Set<number>>(new Set());
-  const [matching, setMatching] = useState<Record<number, number | null>>({0: null, 1: null, 2: null, 3: null});
+  const [matching, setMatching] = useState<Record<number, number | null>>({ 0: null, 1: null, 2: null, 3: null });
   const [gridSelect9, setGridSelect9] = useState<Set<number>>(new Set());
   const [trueFalse, setTrueFalse] = useState<Record<number, boolean | null>>({});
+  const [hoveredMatch, setHoveredMatch] = useState<number | null>(null);
 
   const toggleGridSelect = (set: Set<number>, setFn: (s: Set<number>) => void, idx: number, max: number) => {
     const next = new Set(set);
-    if (next.has(idx)) {
-      next.delete(idx);
-    } else if (next.size < max) {
-      next.add(idx);
-    }
+    if (next.has(idx)) next.delete(idx);
+    else if (next.size < max) next.add(idx);
     setFn(next);
   };
 
+  const answeredMcq = Object.keys(mcqAnswers).length;
+  const totalQuestions = 10;
+  const answeredCount = answeredMcq
+    + (gridSelect6.size === 4 ? 1 : 0)
+    + (multiSelect7.size === 3 ? 1 : 0)
+    + (Object.values(matching).every(v => v !== null) ? 1 : 0)
+    + (gridSelect9.size === 4 ? 1 : 0)
+    + (Object.keys(trueFalse).length === 6 ? 1 : 0);
+
   return (
-    <div className="bg-card border border-border rounded-xl p-6 space-y-8">
-      <div className="flex items-center gap-2 mb-2">
-        <div className="w-2 h-8 bg-primary rounded-full" />
-        <h3 className="text-lg font-display font-bold text-foreground">Question Paper — CSE 4215 — CT 1</h3>
+    <div className="space-y-6">
+      {/* Progress Bar */}
+      <div className="bg-card border border-border rounded-xl p-5">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-primary" />
+            <span className="font-display font-bold text-foreground">Progress</span>
+          </div>
+          <span className="text-sm font-semibold text-primary">{answeredCount}/{totalQuestions} answered</span>
+        </div>
+        <div className="w-full h-3 bg-muted rounded-full overflow-hidden">
+          <div
+            className="h-full rounded-full bg-gradient-to-r from-primary to-accent-foreground transition-all duration-500 ease-out"
+            style={{ width: `${(answeredCount / totalQuestions) * 100}%` }}
+          />
+        </div>
       </div>
 
-      {/* Questions 1-5: MCQ */}
-      {mcqQuestions.map((q) => (
-        <div key={q.id} className="space-y-3">
-          <div className="flex items-start justify-between">
-            <p className="font-semibold text-foreground">
-              <span className="text-primary mr-1">Q{q.id}.</span>{q.text}
+      <div className="bg-card border border-border rounded-xl p-6 space-y-10">
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-1.5 h-10 bg-gradient-to-b from-primary to-accent-foreground rounded-full" />
+          <div>
+            <h3 className="text-xl font-display font-bold text-foreground">CSE 4215 — Class Test #1</h3>
+            <p className="text-sm text-muted-foreground">Winter 2026 · Full Marks: 15 · Time: 15 Minutes</p>
+          </div>
+        </div>
+
+        {/* Questions 1-5: MCQ */}
+        <div className="space-y-8">
+          <div className="flex items-center gap-2">
+            <div className="px-3 py-1 rounded-full bg-gradient-to-r from-primary/10 to-accent/50 text-primary text-xs font-bold font-display">
+              SECTION A — Multiple Choice
+            </div>
+          </div>
+          {mcqQuestions.map((q) => (
+            <div key={q.id} className="space-y-3 group">
+              <div className="flex items-start justify-between gap-3">
+                <p className="font-semibold text-foreground leading-relaxed">
+                  <span className="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-gradient-to-br from-primary to-accent-foreground text-primary-foreground text-xs font-bold mr-2 align-middle">
+                    {q.id}
+                  </span>
+                  {q.text}
+                </p>
+                <div className="flex gap-1.5 shrink-0">
+                  <Badge variant="secondary" className="text-xs whitespace-nowrap">Marks: 1</Badge>
+                  <Badge variant="outline" className="text-xs whitespace-nowrap">CLO: 1</Badge>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pl-9">
+                {q.options.map((opt, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setMcqAnswers({ ...mcqAnswers, [q.id]: i })}
+                    className={cn(
+                      "text-left px-4 py-3 rounded-xl border text-sm transition-all duration-200 relative overflow-hidden",
+                      mcqAnswers[q.id] === i
+                        ? "border-primary bg-gradient-to-r from-primary/10 to-accent/40 text-foreground font-medium shadow-md ring-1 ring-primary/30"
+                        : "border-border bg-card text-foreground hover:border-primary/40 hover:shadow-sm hover:translate-x-0.5"
+                    )}
+                  >
+                    {mcqAnswers[q.id] === i && (
+                      <div className="absolute top-0 right-0 w-6 h-6 bg-gradient-to-bl from-primary to-transparent rounded-bl-xl flex items-end justify-start p-0.5">
+                        <CheckCircle2 className="w-3 h-3 text-primary-foreground" />
+                      </div>
+                    )}
+                    {opt}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Question 6: Grid Select */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 mb-1">
+            <div className="px-3 py-1 rounded-full bg-gradient-to-r from-primary/10 to-accent/50 text-primary text-xs font-bold font-display">
+              SECTION B — Grid Selection
+            </div>
+          </div>
+          <div className="flex items-start justify-between gap-3">
+            <p className="font-semibold text-foreground leading-relaxed">
+              <span className="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-gradient-to-br from-primary to-accent-foreground text-primary-foreground text-xs font-bold mr-2 align-middle">
+                6
+              </span>
+              {gridSelectQ6.text}
             </p>
-            <div className="flex gap-1.5 shrink-0 ml-3">
-              <Badge variant="secondary" className="text-xs">Marks: 1</Badge>
+            <div className="flex gap-1.5 shrink-0">
+              <Badge variant="secondary" className="text-xs">Marks: 2</Badge>
               <Badge variant="outline" className="text-xs">CLO: 1</Badge>
             </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            {q.options.map((opt, i) => (
+          <div className="grid grid-cols-5 gap-2.5 pl-9">
+            {gridSelectQ6.options.map((opt, i) => (
               <button
                 key={i}
-                onClick={() => setMcqAnswers({ ...mcqAnswers, [q.id]: i })}
+                onClick={() => toggleGridSelect(gridSelect6, setGridSelect6, i, 4)}
                 className={cn(
-                  "text-left px-4 py-2.5 rounded-lg border text-sm transition-all",
-                  mcqAnswers[q.id] === i
-                    ? "border-primary bg-accent text-accent-foreground font-medium shadow-sm"
-                    : "border-border bg-card text-foreground hover:border-primary/50 hover:bg-accent/50"
+                  "px-3 py-3.5 rounded-xl border text-sm font-medium transition-all duration-200 text-center relative",
+                  gridSelect6.has(i)
+                    ? "border-primary bg-gradient-to-br from-primary to-accent-foreground text-primary-foreground shadow-lg scale-[1.02]"
+                    : "border-border bg-card text-foreground hover:border-primary/40 hover:shadow-sm hover:scale-[1.01]"
                 )}
               >
+                {gridSelect6.has(i) && <CheckCircle2 className="w-3.5 h-3.5 absolute top-1 right-1 text-primary-foreground/80" />}
                 {opt}
               </button>
             ))}
           </div>
-        </div>
-      ))}
-
-      {/* Question 6: Grid Select */}
-      <div className="space-y-3">
-        <div className="flex items-start justify-between">
-          <p className="font-semibold text-foreground">
-            <span className="text-primary mr-1">Q6.</span>{gridSelectQ6.text}
-          </p>
-          <div className="flex gap-1.5 shrink-0 ml-3">
-            <Badge variant="secondary" className="text-xs">Marks: 2</Badge>
-            <Badge variant="outline" className="text-xs">CLO: 1</Badge>
+          <div className="pl-9 flex items-center gap-2">
+            <div className="flex gap-1">
+              {[0, 1, 2, 3].map(i => (
+                <div key={i} className={cn("w-2.5 h-2.5 rounded-full transition-all", i < gridSelect6.size ? "bg-primary scale-110" : "bg-muted")} />
+              ))}
+            </div>
+            <p className="text-xs text-muted-foreground">Selected: {gridSelect6.size}/4</p>
           </div>
         </div>
-        <div className="grid grid-cols-5 gap-2">
-          {gridSelectQ6.options.map((opt, i) => (
-            <button
-              key={i}
-              onClick={() => toggleGridSelect(gridSelect6, setGridSelect6, i, 4)}
-              className={cn(
-                "px-3 py-3 rounded-lg border text-sm font-medium transition-all text-center",
-                gridSelect6.has(i)
-                  ? "border-primary bg-primary text-primary-foreground shadow-md"
-                  : "border-border bg-card text-foreground hover:border-primary/50"
-              )}
-            >
-              {opt}
-            </button>
-          ))}
-        </div>
-        <p className="text-xs text-muted-foreground">Selected: {gridSelect6.size}/4</p>
-      </div>
 
-      {/* Question 7: Multi-select */}
-      <div className="space-y-3">
-        <div className="flex items-start justify-between">
-          <p className="font-semibold text-foreground">
-            <span className="text-primary mr-1">Q7.</span>{multiSelectQ7.text}
-          </p>
-          <div className="flex gap-1.5 shrink-0 ml-3">
-            <Badge variant="secondary" className="text-xs">Marks: 2</Badge>
-            <Badge variant="outline" className="text-xs">CLO: 1</Badge>
+        {/* Question 7: Multi-select */}
+        <div className="space-y-4">
+          <div className="flex items-start justify-between gap-3">
+            <p className="font-semibold text-foreground leading-relaxed">
+              <span className="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-gradient-to-br from-primary to-accent-foreground text-primary-foreground text-xs font-bold mr-2 align-middle">
+                7
+              </span>
+              {multiSelectQ7.text}
+            </p>
+            <div className="flex gap-1.5 shrink-0">
+              <Badge variant="secondary" className="text-xs">Marks: 2</Badge>
+              <Badge variant="outline" className="text-xs">CLO: 1</Badge>
+            </div>
           </div>
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-          {multiSelectQ7.options.map((opt, i) => (
-            <button
-              key={i}
-              onClick={() => toggleGridSelect(multiSelect7, setMultiSelect7, i, 3)}
-              className={cn(
-                "px-4 py-3 rounded-lg border text-sm font-medium transition-all text-center",
-                multiSelect7.has(i)
-                  ? "border-primary bg-primary text-primary-foreground shadow-md"
-                  : "border-border bg-card text-foreground hover:border-primary/50"
-              )}
-            >
-              {opt}
-            </button>
-          ))}
-        </div>
-        <p className="text-xs text-muted-foreground">Selected: {multiSelect7.size}/3</p>
-      </div>
-
-      {/* Question 8: Matching */}
-      <div className="space-y-3">
-        <div className="flex items-start justify-between">
-          <p className="font-semibold text-foreground">
-            <span className="text-primary mr-1">Q8.</span>{matchingQ8.text}
-          </p>
-          <div className="flex gap-1.5 shrink-0 ml-3">
-            <Badge variant="secondary" className="text-xs">Marks: 2</Badge>
-            <Badge variant="outline" className="text-xs">CLO: 1</Badge>
-          </div>
-        </div>
-        <div className="space-y-3">
-          {matchingQ8.left.map((item, i) => (
-            <div key={i} className="flex items-center gap-3">
-              <div className="flex-1 px-4 py-2.5 rounded-lg bg-accent border border-border text-sm font-medium text-accent-foreground">
-                {item}
-              </div>
-              <svg className="w-6 h-4 text-primary shrink-0" viewBox="0 0 24 16"><path d="M0 8h20M16 3l5 5-5 5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-              <select
-                value={matching[i] ?? ""}
-                onChange={(e) => setMatching({ ...matching, [i]: e.target.value === "" ? null : Number(e.target.value) })}
-                className="flex-1 px-3 py-2.5 rounded-lg border border-border bg-card text-sm text-foreground focus:ring-2 focus:ring-ring"
+          <div className="grid grid-cols-1 gap-2.5 pl-9">
+            {multiSelectQ7.options.map((opt, i) => (
+              <button
+                key={i}
+                onClick={() => toggleGridSelect(multiSelect7, setMultiSelect7, i, 3)}
+                className={cn(
+                  "text-left px-5 py-3.5 rounded-xl border text-sm font-medium transition-all duration-200 flex items-center gap-3",
+                  multiSelect7.has(i)
+                    ? "border-primary bg-gradient-to-r from-primary/10 to-accent/40 text-foreground shadow-md ring-1 ring-primary/30"
+                    : "border-border bg-card text-foreground hover:border-primary/40 hover:shadow-sm"
+                )}
               >
-                <option value="">Select match...</option>
-                {matchingQ8.right.map((r, ri) => (
-                  <option key={ri} value={ri}>{r}</option>
-                ))}
-              </select>
+                <div className={cn(
+                  "w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all shrink-0",
+                  multiSelect7.has(i) ? "border-primary bg-primary" : "border-muted-foreground/30"
+                )}>
+                  {multiSelect7.has(i) && <CheckCircle2 className="w-3.5 h-3.5 text-primary-foreground" />}
+                </div>
+                {opt}
+              </button>
+            ))}
+          </div>
+          <div className="pl-9 flex items-center gap-2">
+            <div className="flex gap-1">
+              {[0, 1, 2].map(i => (
+                <div key={i} className={cn("w-2.5 h-2.5 rounded-full transition-all", i < multiSelect7.size ? "bg-primary scale-110" : "bg-muted")} />
+              ))}
             </div>
-          ))}
+            <p className="text-xs text-muted-foreground">Selected: {multiSelect7.size}/3</p>
+          </div>
         </div>
-      </div>
 
-      {/* Question 9: Grid Select */}
-      <div className="space-y-3">
-        <div className="flex items-start justify-between">
-          <p className="font-semibold text-foreground">
-            <span className="text-primary mr-1">Q9.</span>Select exactly 4 items that are considered professional misconduct in computing:
-          </p>
-          <div className="flex gap-1.5 shrink-0 ml-3">
-            <Badge variant="secondary" className="text-xs">Marks: 2</Badge>
-            <Badge variant="outline" className="text-xs">CLO: 1</Badge>
+        {/* Question 8: Matching */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 mb-1">
+            <div className="px-3 py-1 rounded-full bg-gradient-to-r from-primary/10 to-accent/50 text-primary text-xs font-bold font-display">
+              SECTION C — Matching
+            </div>
           </div>
-        </div>
-        <div className="grid grid-cols-5 gap-2">
-          {gridSelectQ9.options.map((opt, i) => (
-            <button
-              key={i}
-              onClick={() => toggleGridSelect(gridSelect9, setGridSelect9, i, 4)}
-              className={cn(
-                "px-3 py-3 rounded-lg border text-sm font-medium transition-all text-center",
-                gridSelect9.has(i)
-                  ? "border-primary bg-primary text-primary-foreground shadow-md"
-                  : "border-border bg-card text-foreground hover:border-primary/50"
-              )}
-            >
-              {opt}
-            </button>
-          ))}
-        </div>
-        <p className="text-xs text-muted-foreground">Selected: {gridSelect9.size}/4</p>
-      </div>
-
-      {/* Question 10: True/False */}
-      <div className="space-y-3">
-        <div className="flex items-start justify-between">
-          <p className="font-semibold text-foreground">
-            <span className="text-primary mr-1">Q10.</span>{trueFalseQ10.text}
-          </p>
-          <div className="flex gap-1.5 shrink-0 ml-3">
-            <Badge variant="secondary" className="text-xs">Marks: 2</Badge>
-            <Badge variant="outline" className="text-xs">CLO: 1</Badge>
+          <div className="flex items-start justify-between gap-3">
+            <p className="font-semibold text-foreground leading-relaxed">
+              <span className="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-gradient-to-br from-primary to-accent-foreground text-primary-foreground text-xs font-bold mr-2 align-middle">
+                8
+              </span>
+              {matchingQ8.text}
+            </p>
+            <div className="flex gap-1.5 shrink-0">
+              <Badge variant="secondary" className="text-xs">Marks: 2</Badge>
+              <Badge variant="outline" className="text-xs">CLO: 1</Badge>
+            </div>
           </div>
-        </div>
-        <div className="border border-border rounded-lg overflow-hidden">
-          <div className="grid grid-cols-[1fr_80px_80px] bg-muted px-4 py-2 text-sm font-semibold text-foreground">
-            <span>Statement</span>
-            <span className="text-center">True</span>
-            <span className="text-center">False</span>
-          </div>
-          {trueFalseQ10.statements.map((stmt, i) => (
-            <div key={i} className={cn("grid grid-cols-[1fr_80px_80px] px-4 py-3 text-sm items-center", i % 2 === 0 ? "bg-card" : "bg-muted/50")}>
-              <span className="text-foreground">{stmt}</span>
-              <div className="flex justify-center">
-                <button
-                  onClick={() => setTrueFalse({ ...trueFalse, [i]: true })}
+          <div className="pl-9 space-y-3">
+            <div className="grid grid-cols-[1fr_40px_1fr] gap-0 items-start">
+              <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider px-4 py-2">Table A</div>
+              <div />
+              <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider px-4 py-2">Table B</div>
+            </div>
+            {matchingQ8.left.map((item, i) => (
+              <div
+                key={i}
+                className="grid grid-cols-[1fr_40px_1fr] gap-0 items-center"
+                onMouseEnter={() => setHoveredMatch(i)}
+                onMouseLeave={() => setHoveredMatch(null)}
+              >
+                <div className={cn(
+                  "px-4 py-3 rounded-xl border text-sm font-medium transition-all duration-200",
+                  matching[i] !== null
+                    ? "bg-gradient-to-r from-primary/10 to-accent/30 border-primary/40 text-foreground"
+                    : hoveredMatch === i
+                      ? "bg-accent/50 border-primary/30 text-foreground"
+                      : "bg-card border-border text-foreground"
+                )}>
+                  {item}
+                </div>
+                <div className="flex justify-center">
+                  <ArrowRight className={cn(
+                    "w-5 h-5 transition-all duration-200",
+                    matching[i] !== null ? "text-primary scale-110" : "text-muted-foreground/40"
+                  )} />
+                </div>
+                <select
+                  value={matching[i] ?? ""}
+                  onChange={(e) => setMatching({ ...matching, [i]: e.target.value === "" ? null : Number(e.target.value) })}
                   className={cn(
-                    "w-8 h-8 rounded-full border-2 transition-all flex items-center justify-center text-xs font-bold",
-                    trueFalse[i] === true
-                      ? "border-primary bg-primary text-primary-foreground"
-                      : "border-border text-muted-foreground hover:border-primary/50"
+                    "px-3 py-3 rounded-xl border text-sm transition-all duration-200 bg-card text-foreground focus:ring-2 focus:ring-ring cursor-pointer",
+                    matching[i] !== null ? "border-primary/40 font-medium" : "border-border"
                   )}
                 >
-                  T
-                </button>
+                  <option value="">Select match...</option>
+                  {matchingQ8.right.map((r, ri) => (
+                    <option key={ri} value={ri}>{r}</option>
+                  ))}
+                </select>
               </div>
-              <div className="flex justify-center">
-                <button
-                  onClick={() => setTrueFalse({ ...trueFalse, [i]: false })}
-                  className={cn(
-                    "w-8 h-8 rounded-full border-2 transition-all flex items-center justify-center text-xs font-bold",
-                    trueFalse[i] === false
-                      ? "border-destructive bg-destructive text-destructive-foreground"
-                      : "border-border text-muted-foreground hover:border-destructive/50"
-                  )}
-                >
-                  F
-                </button>
-              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Question 9: Grid Select */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 mb-1">
+            <div className="px-3 py-1 rounded-full bg-gradient-to-r from-primary/10 to-accent/50 text-primary text-xs font-bold font-display">
+              SECTION D — Grid Selection
             </div>
-          ))}
+          </div>
+          <div className="flex items-start justify-between gap-3">
+            <p className="font-semibold text-foreground leading-relaxed">
+              <span className="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-gradient-to-br from-primary to-accent-foreground text-primary-foreground text-xs font-bold mr-2 align-middle">
+                9
+              </span>
+              {gridSelectQ9.text}
+            </p>
+            <div className="flex gap-1.5 shrink-0">
+              <Badge variant="secondary" className="text-xs">Marks: 2</Badge>
+              <Badge variant="outline" className="text-xs">CLO: 1</Badge>
+            </div>
+          </div>
+          <div className="grid grid-cols-5 gap-2.5 pl-9">
+            {gridSelectQ9.options.map((opt, i) => (
+              <button
+                key={i}
+                onClick={() => toggleGridSelect(gridSelect9, setGridSelect9, i, 4)}
+                className={cn(
+                  "px-3 py-3.5 rounded-xl border text-sm font-medium transition-all duration-200 text-center relative",
+                  gridSelect9.has(i)
+                    ? "border-primary bg-gradient-to-br from-primary to-accent-foreground text-primary-foreground shadow-lg scale-[1.02]"
+                    : "border-border bg-card text-foreground hover:border-primary/40 hover:shadow-sm hover:scale-[1.01]"
+                )}
+              >
+                {gridSelect9.has(i) && <CheckCircle2 className="w-3.5 h-3.5 absolute top-1 right-1 text-primary-foreground/80" />}
+                {opt}
+              </button>
+            ))}
+          </div>
+          <div className="pl-9 flex items-center gap-2">
+            <div className="flex gap-1">
+              {[0, 1, 2, 3].map(i => (
+                <div key={i} className={cn("w-2.5 h-2.5 rounded-full transition-all", i < gridSelect9.size ? "bg-primary scale-110" : "bg-muted")} />
+              ))}
+            </div>
+            <p className="text-xs text-muted-foreground">Selected: {gridSelect9.size}/4</p>
+          </div>
+        </div>
+
+        {/* Question 10: True/False */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 mb-1">
+            <div className="px-3 py-1 rounded-full bg-gradient-to-r from-primary/10 to-accent/50 text-primary text-xs font-bold font-display">
+              SECTION E — True / False
+            </div>
+          </div>
+          <div className="flex items-start justify-between gap-3">
+            <p className="font-semibold text-foreground leading-relaxed">
+              <span className="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-gradient-to-br from-primary to-accent-foreground text-primary-foreground text-xs font-bold mr-2 align-middle">
+                10
+              </span>
+              {trueFalseQ10.text}
+            </p>
+            <div className="flex gap-1.5 shrink-0">
+              <Badge variant="secondary" className="text-xs">Marks: 2</Badge>
+              <Badge variant="outline" className="text-xs">CLO: 1</Badge>
+            </div>
+          </div>
+          <div className="pl-9 border border-border rounded-xl overflow-hidden">
+            <div className="grid grid-cols-[1fr_80px_80px] bg-gradient-to-r from-primary/5 to-accent/20 px-5 py-3 text-sm font-bold text-foreground font-display">
+              <span>Statement</span>
+              <span className="text-center text-primary">True</span>
+              <span className="text-center text-destructive">False</span>
+            </div>
+            {trueFalseQ10.statements.map((stmt, i) => (
+              <div key={i} className={cn(
+                "grid grid-cols-[1fr_80px_80px] px-5 py-4 text-sm items-center transition-colors",
+                i % 2 === 0 ? "bg-card" : "bg-muted/30"
+              )}>
+                <span className="text-foreground leading-relaxed pr-4">{stmt}</span>
+                <div className="flex justify-center">
+                  <button
+                    onClick={() => setTrueFalse({ ...trueFalse, [i]: true })}
+                    className={cn(
+                      "w-9 h-9 rounded-xl border-2 transition-all duration-200 flex items-center justify-center text-xs font-bold",
+                      trueFalse[i] === true
+                        ? "border-primary bg-gradient-to-br from-primary to-accent-foreground text-primary-foreground shadow-md scale-110"
+                        : "border-border text-muted-foreground hover:border-primary/50 hover:scale-105"
+                    )}
+                  >
+                    T
+                  </button>
+                </div>
+                <div className="flex justify-center">
+                  <button
+                    onClick={() => setTrueFalse({ ...trueFalse, [i]: false })}
+                    className={cn(
+                      "w-9 h-9 rounded-xl border-2 transition-all duration-200 flex items-center justify-center text-xs font-bold",
+                      trueFalse[i] === false
+                        ? "border-destructive bg-destructive text-destructive-foreground shadow-md scale-110"
+                        : "border-border text-muted-foreground hover:border-destructive/50 hover:scale-105"
+                    )}
+                  >
+                    F
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>

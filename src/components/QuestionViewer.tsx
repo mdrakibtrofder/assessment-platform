@@ -492,11 +492,11 @@ const QuestionViewer = () => {
                 </div>
                 <div className="flex justify-center">
                   <button
-                    onClick={() => setTrueFalse({ ...trueFalse, [i]: false })}
+                    onClick={() => { const next = { ...trueFalse, [i]: false }; setTrueFalse(next); persistAll({ trueFalse: next }); }}
                     className={cn(
                       "w-9 h-9 rounded-xl border-2 transition-all duration-200 flex items-center justify-center text-xs font-bold",
                       trueFalse[i] === false
-                        ? "border-destructive bg-destructive text-destructive-foreground shadow-md scale-110"
+                        ? "border-destructive bg-gradient-to-br from-destructive to-pink-500 text-destructive-foreground shadow-md scale-110"
                         : "border-border text-muted-foreground hover:border-destructive/50 hover:scale-105"
                     )}
                   >

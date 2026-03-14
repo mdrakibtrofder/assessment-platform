@@ -265,7 +265,7 @@ const QuestionViewer = () => {
             {gridSelectQ6.options.map((opt, i) => (
               <button
                 key={i}
-                onClick={() => toggleGridSelect(gridSelect6, setGridSelect6, i, 4)}
+                onClick={() => toggleGridSelect(gridSelect6, setGridSelect6, i, 4, 'gridSelect6')}
                 className={cn(
                   "px-3 py-3.5 rounded-xl border text-sm font-medium transition-all duration-200 text-center relative",
                   gridSelect6.has(i)

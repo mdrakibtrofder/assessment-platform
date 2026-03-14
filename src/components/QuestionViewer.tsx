@@ -123,14 +123,14 @@ const loadFromStorage = () => {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) return JSON.parse(saved);
-  } catch {}
+  } catch { }
   return null;
 };
 
 const saveToStorage = (data: any) => {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-  } catch {}
+  } catch { }
 };
 
 const QuestionViewer = () => {
@@ -173,9 +173,9 @@ const QuestionViewer = () => {
     + (Object.keys(trueFalse).length === 6 ? 1 : 0);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 questions-content p-4 bg-white">
       {/* Progress Bar */}
-      <div className="bg-card border border-border rounded-xl p-5">
+      <div className="bg-card border border-border rounded-xl p-5" data-html2canvas-ignore>
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-primary" />

@@ -3,9 +3,11 @@ import { Button } from "@/components/ui/button";
 
 interface HeaderProps {
   onReset: () => void;
+  onExport: () => void;
+  isExportEnabled?: boolean;
 }
 
-const Header = ({ onReset }: HeaderProps) => {
+const Header = ({ onReset, onExport, isExportEnabled }: HeaderProps) => {
   return (
     <header className="bg-card border-b-2 border-header-border px-6 py-3 flex items-center justify-between sticky top-0 z-50 shadow-sm">
       <div className="flex items-center gap-3">
@@ -22,7 +24,12 @@ const Header = ({ onReset }: HeaderProps) => {
           <RotateCcw className="w-4 h-4" />
           Reset
         </button>
-        <Button variant="outline" className="gap-1.5">
+        <Button
+          variant="outline"
+          className="gap-1.5"
+          onClick={onExport}
+          disabled={!isExportEnabled}
+        >
           <Download className="w-4 h-4" />
           PDF
         </Button>

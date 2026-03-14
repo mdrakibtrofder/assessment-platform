@@ -1,7 +1,21 @@
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { CheckCircle2, XCircle, ArrowRight, Sparkles } from "lucide-react";
+import {
+  CheckCircle2, XCircle, ArrowRight, Sparkles,
+  FileSearch, Send, ShieldCheck, Loader2
+} from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import axios from "axios";
 
 const mcqQuestions = [
   {
@@ -146,6 +160,12 @@ const QuestionViewer = ({ metadata }: { metadata: any }) => {
   const [gridSelect9, setGridSelect9] = useState<Set<number>>(new Set(saved?.gridSelect9 ?? []));
   const [trueFalse, setTrueFalse] = useState<Record<number, boolean | null>>(saved?.trueFalse ?? {});
   const [hoveredMatch, setHoveredMatch] = useState<number | null>(null);
+
+  // Submission States
+  const [showPreview, setShowPreview] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [finalScore, setFinalScore] = useState<number | null>(null);
 
   const persistAll = (overrides: any = {}) => {
     const data = {
@@ -516,35 +536,135 @@ const QuestionViewer = ({ metadata }: { metadata: any }) => {
       {/* Submit Button */}
       <div className="flex justify-center pt-6 pb-12">
         <button
-          onClick={async () => {
-            const { exportToJSON } = await import("@/lib/exportUtils");
-            const questionsContainer = document.querySelector(".questions-content");
-
-            const answers = {
-              mcqAnswers,
-              gridSelect6: Array.from(gridSelect6),
-              multiSelect7: Array.from(multiSelect7),
-              matching,
-              gridSelect9: Array.from(gridSelect9),
-              trueFalse,
-            };
-
-            await exportToJSON({
-              ...metadata,
-              questionsHtml: questionsContainer?.innerHTML || "",
-              answers
-            });
-
-            alert("Assessment submitted successfully! The answer JSON has been generated.");
-          }}
+          onClick={() => setShowPreview(true)}
           className="group relative px-12 py-4 bg-gradient-to-r from-primary to-accent-foreground text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 flex items-center gap-3"
         >
           <div className="absolute inset-0 bg-white/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
-          <CheckCircle2 className="w-6 h-6" />
-          <span className="text-lg">Final Submission</span>
+          <FileSearch className="w-6 h-6" />
+          <span className="text-lg">Preview & Submit</span>
           <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
         </button>
       </div>
+
+      {/* PDF Preview Dialog */}
+      <Dialog open={showPreview} onOpenChange={setShowPreview}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col p-0 border-none shadow-2xl" hideClose>
+          <DialogHeader className="p-6 bg-gradient-to-r from-primary to-accent-foreground text-white">
+            <DialogTitle className="text-2xl font-display font-bold flex items-center gap-3">
+              <ShieldCheck className="w-8 h-8" />
+              Final Submission Preview
+            </DialogTitle>
+            <DialogDescription className="text-white/80 font-medium">
+              Please review your answers carefully. Once submitted, your assessment will be graded and stored.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="flex-1 overflow-y-auto p-8 bg-slate-50">
+            <div className="bg-white shadow-sm border border-slate-200 rounded-xl overflow-hidden">
+              <div className="p-6 border-b border-slate-100 bg-slate-50/50 flex justify-between items-end">
+                <div>
+                  <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Student Identifier</h4>
+                  <p className="text-xl font-display font-black text-slate-800">{metadata.studentName}</p>
+                  <p className="text-sm font-mono text-slate-500">{metadata.studentId}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm font-bold text-primary">{metadata.courseCode}</p>
+                  <p className="text-xs text-slate-400 font-medium">{metadata.date}</p>
+                </div>
+              </div>
+              <div className="p-8 space-y-6">
+                <div className="flex items-center gap-4 text-emerald-600 bg-emerald-50 p-4 rounded-lg border border-emerald-100">
+                  <CheckCircle2 className="w-5 h-5" />
+                  <p className="text-sm font-medium">All {totalQuestions} questions have been answered. Ready for grading.</p>
+                </div>
+                <p className="text-slate-500 text-sm leading-relaxed">
+                  By clicking "Confirm Submission", you acknowledge that the answers shown are final.
+                  A PDF copy will be generated for your records, and data will be synchronized with the BAUST Assessment Engine.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter className="p-6 bg-white border-t border-slate-100 flex items-center justify-between sm:justify-between">
+            <Button variant="ghost" onClick={() => setShowPreview(false)} className="font-bold text-slate-500">
+              Back to Editor
+            </Button>
+            <Button
+              disabled={isSubmitting}
+              onClick={async () => {
+                setIsSubmitting(true);
+                try {
+                  const { exportToPDF } = await import("@/lib/exportUtils");
+                  const questionsContainer = document.querySelector(".questions-content");
+
+                  const submissionData = {
+                    studentId: metadata.studentId,
+                    studentName: metadata.studentName,
+                    courseCode: metadata.courseCode,
+                    courseName: metadata.courseName,
+                    ctNumber: metadata.ctNumber,
+                    answers: {
+                      mcqAnswers,
+                      gridSelect6: Array.from(gridSelect6),
+                      multiSelect7: Array.from(multiSelect7),
+                      matching,
+                      gridSelect9: Array.from(gridSelect9),
+                      trueFalse,
+                    }
+                  };
+
+                  await exportToPDF({
+                    ...metadata,
+                    questionsHtml: questionsContainer?.innerHTML || ""
+                  });
+
+                  const response = await axios.post("http://localhost:3001/assessment/submit", submissionData);
+
+                  setFinalScore(response.data.score);
+                  setShowPreview(false);
+                  setShowSuccess(true);
+                  localStorage.removeItem(STORAGE_KEY);
+                } catch (err) {
+                  console.error(err);
+                  toast.error("Submission failed. Please check backend connection.");
+                } finally {
+                  setIsSubmitting(false);
+                }
+              }}
+              className="bg-primary hover:bg-primary/90 font-bold px-8 h-12 rounded-xl flex items-center gap-2 shadow-lg"
+            >
+              {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
+              {isSubmitting ? "Processing..." : "Confirm Submission"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showSuccess} onOpenChange={setShowSuccess}>
+        <DialogContent className="max-w-md p-0 border-none shadow-2xl overflow-hidden" hideClose>
+          <div className="bg-gradient-to-br from-emerald-500 to-teal-600 p-12 text-center text-white">
+            <div className="mx-auto w-24 h-24 bg-white/20 rounded-full flex items-center justify-center mb-6 scale-110 animate-bounce">
+              <CheckCircle2 className="w-12 h-12 text-white" />
+            </div>
+            <h2 className="text-3xl font-display font-black mb-2">Submission Success!</h2>
+            <p className="text-emerald-50 font-medium">Your assessment has been securely synced and graded.</p>
+          </div>
+          <div className="p-8 bg-white space-y-6 text-center">
+            <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100">
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Your Preliminary Grade</p>
+              <p className="text-5xl font-display font-black text-slate-800">{finalScore ?? '--'}<span className="text-lg text-slate-400">/15</span></p>
+            </div>
+            <div className="space-y-4">
+              <p className="text-sm text-slate-500 leading-relaxed">
+                A PDF copy of your submission has been downloaded. You may logout or refresh the platform to start a new session.
+              </p>
+              <Button onClick={() => window.location.reload()} className="w-full bg-slate-900 hover:bg-slate-800 h-14 rounded-2xl font-bold text-lg">
+                Finished
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

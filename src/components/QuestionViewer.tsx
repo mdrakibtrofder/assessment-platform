@@ -306,17 +306,17 @@ const QuestionViewer = () => {
             {multiSelectQ7.options.map((opt, i) => (
               <button
                 key={i}
-                onClick={() => toggleGridSelect(multiSelect7, setMultiSelect7, i, 3)}
+                onClick={() => toggleGridSelect(multiSelect7, setMultiSelect7, i, 3, 'multiSelect7')}
                 className={cn(
                   "text-left px-5 py-3.5 rounded-xl border text-sm font-medium transition-all duration-200 flex items-center gap-3",
                   multiSelect7.has(i)
-                    ? "border-primary bg-gradient-to-r from-primary/10 to-accent/40 text-foreground shadow-md ring-1 ring-primary/30"
+                    ? "border-primary bg-gradient-to-br from-primary to-accent-foreground text-primary-foreground shadow-lg scale-[1.02]"
                     : "border-border bg-card text-foreground hover:border-primary/40 hover:shadow-sm"
                 )}
               >
                 <div className={cn(
                   "w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all shrink-0",
-                  multiSelect7.has(i) ? "border-primary bg-primary" : "border-muted-foreground/30"
+                  multiSelect7.has(i) ? "border-primary-foreground/50 bg-primary-foreground/20" : "border-muted-foreground/30"
                 )}>
                   {multiSelect7.has(i) && <CheckCircle2 className="w-3.5 h-3.5 text-primary-foreground" />}
                 </div>

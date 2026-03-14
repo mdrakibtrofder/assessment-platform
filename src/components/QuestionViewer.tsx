@@ -133,12 +133,16 @@ const saveToStorage = (data: any) => {
   } catch { }
 };
 
-const QuestionViewer = () => {
+const QuestionViewer = ({ metadata }: { metadata: any }) => {
   const saved = loadFromStorage();
   const [mcqAnswers, setMcqAnswers] = useState<Record<number, number>>(saved?.mcqAnswers ?? {});
   const [gridSelect6, setGridSelect6] = useState<Set<number>>(new Set(saved?.gridSelect6 ?? []));
   const [multiSelect7, setMultiSelect7] = useState<Set<number>>(new Set(saved?.multiSelect7 ?? []));
-  const [matching, setMatching] = useState<Record<number, number | null>>(saved?.matching ?? { 0: null, 1: null, 2: null, 3: null });
+  const [matching, setMatching] = useState<Record<number, number | null>>(
+    saved?.matching
+      ? Object.fromEntries(Object.entries(saved.matching).map(([k, v]) => [Number(k), v === null ? null : Number(v)]))
+      : { 0: null, 1: null, 2: null, 3: null }
+  );
   const [gridSelect9, setGridSelect9] = useState<Set<number>>(new Set(saved?.gridSelect9 ?? []));
   const [trueFalse, setTrueFalse] = useState<Record<number, boolean | null>>(saved?.trueFalse ?? {});
   const [hoveredMatch, setHoveredMatch] = useState<number | null>(null);
@@ -507,6 +511,39 @@ const QuestionViewer = () => {
             ))}
           </div>
         </div>
+      </div>
+
+      {/* Submit Button */}
+      <div className="flex justify-center pt-6 pb-12">
+        <button
+          onClick={async () => {
+            const { exportToJSON } = await import("@/lib/exportUtils");
+            const questionsContainer = document.querySelector(".questions-content");
+
+            const answers = {
+              mcqAnswers,
+              gridSelect6: Array.from(gridSelect6),
+              multiSelect7: Array.from(multiSelect7),
+              matching,
+              gridSelect9: Array.from(gridSelect9),
+              trueFalse,
+            };
+
+            await exportToJSON({
+              ...metadata,
+              questionsHtml: questionsContainer?.innerHTML || "",
+              answers
+            });
+
+            alert("Assessment submitted successfully! The answer JSON has been generated.");
+          }}
+          className="group relative px-12 py-4 bg-gradient-to-r from-primary to-accent-foreground text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 flex items-center gap-3"
+        >
+          <div className="absolute inset-0 bg-white/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
+          <CheckCircle2 className="w-6 h-6" />
+          <span className="text-lg">Final Submission</span>
+          <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+        </button>
       </div>
     </div>
   );

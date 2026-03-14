@@ -1,7 +1,8 @@
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import { saveAs } from "file-saver";
 
-interface ExportData {
+export interface ExportData {
   universityName: string;
   department: string;
   courseCode: string;
@@ -11,6 +12,7 @@ interface ExportData {
   ctNumber: string;
   date: string;
   questionsHtml: string;
+  answers?: any;
 }
 
 function getFormattedDateTime(): string {
@@ -65,7 +67,7 @@ function buildExportHtml(data: ExportData, logoDataUrl?: string): string {
       <tr><td style="padding: 6px 0; font-weight: 600;">Date:</td><td style="padding: 6px 0;">${data.date}</td></tr>
     </table>
     <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 16px 0;" />
-    <div style="font-size: 14px; line-height: 1.7;">
+    <div style="font-size: 14px; line-height: 1.7; color: #1a1a2e !important;">
       ${data.questionsHtml}
     </div>
   `;
@@ -101,8 +103,7 @@ export async function exportToPDF(data: ExportData) {
     )
   );
 
-  // Small delay for rendering
-  await new Promise((r) => setTimeout(r, 100));
+  await new Promise((r) => setTimeout(r, 200));
 
   try {
     const canvas = await html2canvas(container, {
@@ -110,6 +111,40 @@ export async function exportToPDF(data: ExportData) {
       useCORS: true,
       allowTaint: true,
       backgroundColor: "#ffffff",
+      onclone: (clonedDoc) => {
+        const originalSelects = container.querySelectorAll('select');
+        const clonedSelects = clonedDoc.querySelectorAll('select');
+
+        clonedSelects.forEach((select, i) => {
+          const val = (originalSelects[i] as HTMLSelectElement).value;
+          const options = Array.from((originalSelects[i] as HTMLSelectElement).options);
+          const selectedOption = options.find(o => o.value === val);
+          const text = selectedOption ? selectedOption.text : "";
+
+          const wrapper = clonedDoc.createElement('div');
+          wrapper.style.display = 'inline-block';
+          wrapper.style.padding = '8px 12px';
+          wrapper.style.border = '1px solid #2563eb33';
+          wrapper.style.borderRadius = '8px';
+          wrapper.style.minWidth = '140px';
+          wrapper.style.fontSize = '13px';
+          wrapper.style.backgroundColor = '#f0f7ff';
+          wrapper.style.color = '#1a365d';
+          wrapper.style.fontWeight = '500';
+          wrapper.textContent = text || 'Not selected';
+
+          if (select.parentNode) {
+            select.parentNode.replaceChild(wrapper, select);
+          }
+        });
+
+        // Fix for inconsistent height/text breaks
+        const containerInClone = clonedDoc.querySelector('.pdf-export-container') as HTMLElement;
+        if (containerInClone) {
+          containerInClone.style.height = 'auto';
+          containerInClone.style.overflow = 'visible';
+        }
+      }
     });
 
     const imgData = canvas.toDataURL("image/png");
@@ -122,18 +157,40 @@ export async function exportToPDF(data: ExportData) {
     let heightLeft = imgHeight;
     let position = 0;
 
-    pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+    pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight, undefined, 'FAST');
     heightLeft -= pdfHeight;
 
     while (heightLeft > 0) {
       position = -(imgHeight - heightLeft);
       pdf.addPage();
-      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight, undefined, 'FAST');
       heightLeft -= pdfHeight;
     }
 
-    pdf.save(`${data.studentId}_${data.studentName}_${data.courseCode}${data.ctNumber}_${getFormattedDateTime()}.pdf`);
+    const filename = `${data.studentId}_${data.studentName}_${data.courseCode}${data.ctNumber}_${getFormattedDateTime()}`;
+    pdf.save(`${filename}.pdf`);
   } finally {
     document.body.removeChild(container);
   }
+}
+
+export function exportToJSON(data: ExportData) {
+  const jsonData = JSON.stringify({
+    metadata: {
+      university: data.universityName,
+      department: data.department,
+      courseCode: data.courseCode,
+      courseName: data.courseName,
+      studentName: data.studentName,
+      studentId: data.studentId,
+      ctNumber: data.ctNumber,
+      date: data.date,
+      exportedAt: new Date().toISOString()
+    },
+    answers: data.answers
+  }, null, 2);
+
+  const blob = new Blob([jsonData], { type: "application/json" });
+  const filename = `${data.studentId}_${data.studentName}_${data.courseCode}${data.ctNumber}_${getFormattedDateTime()}`;
+  saveAs(blob, `${filename}.json`);
 }

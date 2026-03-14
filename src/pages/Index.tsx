@@ -69,7 +69,20 @@ const Index = () => {
           ctNumber={ctNumber}
           setCtNumber={setCtNumber}
         />
-        {showQuestions && <QuestionViewer />}
+        {showQuestions && (
+          <QuestionViewer
+            metadata={{
+              universityName: "Bangladesh Army University of Science and Technology",
+              department: courses.find(c => c.code === courseCode)?.department || "",
+              courseCode,
+              courseName: courses.find(c => c.code === courseCode)?.name || "",
+              studentName,
+              studentId,
+              ctNumber,
+              date: format(new Date(), "MMMM do, yyyy")
+            }}
+          />
+        )}
       </main>
     </div>
   );

@@ -155,11 +155,12 @@ const QuestionViewer = () => {
     saveToStorage(data);
   };
 
-  const toggleGridSelect = (set: Set<number>, setFn: (s: Set<number>) => void, idx: number, max: number) => {
+  const toggleGridSelect = (set: Set<number>, setFn: (s: Set<number>) => void, idx: number, max: number, key: string) => {
     const next = new Set(set);
     if (next.has(idx)) next.delete(idx);
     else if (next.size < max) next.add(idx);
     setFn(next);
+    persistAll({ [key]: next });
   };
 
   const answeredMcq = Object.keys(mcqAnswers).length;

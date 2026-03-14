@@ -384,7 +384,7 @@ const QuestionViewer = () => {
                 </div>
                 <select
                   value={matching[i] ?? ""}
-                  onChange={(e) => setMatching({ ...matching, [i]: e.target.value === "" ? null : Number(e.target.value) })}
+                  onChange={(e) => { const next = { ...matching, [i]: e.target.value === "" ? null : Number(e.target.value) }; setMatching(next); persistAll({ matching: next }); }}
                   className={cn(
                     "px-3 py-3 rounded-xl border text-sm transition-all duration-200 bg-card text-foreground focus:ring-2 focus:ring-ring cursor-pointer",
                     matching[i] !== null ? "border-primary/40 font-medium" : "border-border"

@@ -26,10 +26,6 @@ const Header = ({ onReset }: HeaderProps) => {
           <Download className="w-4 h-4" />
           PDF
         </Button>
-        <Button className="gap-1.5">
-          <Download className="w-4 h-4" />
-          DOCX
-        </Button>
       </div>
     </header>
   );

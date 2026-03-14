@@ -232,11 +232,7 @@ const QuestionViewer = () => {
                         : "border-border bg-card text-foreground hover:border-primary/40 hover:shadow-sm hover:translate-x-0.5"
                     )}
                   >
-                    {mcqAnswers[q.id] === i && (
-                      <div className="absolute top-0 right-0 w-6 h-6 bg-gradient-to-bl from-primary to-transparent rounded-bl-xl flex items-end justify-start p-0.5">
-                        <CheckCircle2 className="w-3 h-3 text-primary-foreground" />
-                      </div>
-                    )}
+                    {mcqAnswers[q.id] === i && <CheckCircle2 className="w-3.5 h-3.5 absolute top-1 right-1 text-primary-foreground/80" />}
                     {opt}
                   </button>
                 ))}
